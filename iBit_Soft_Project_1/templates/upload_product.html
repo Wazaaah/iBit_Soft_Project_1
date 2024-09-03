@@ -1,0 +1,42 @@
+{% extends 'index.html' %}
+{% load static %}
+{% static "images" as baseUrl %}
+
+{% block content %}
+    <!-- Start Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-lg-5">
+                    <div class="intro-excerpt">
+                        <h1>Upload Product</h1>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <!-- Additional Content or Sidebar can go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Hero Section -->
+
+    <div class="untree_co-section product-section before-footer-section">
+        <div class="container">
+            <div class="row">
+                <!-- Start Upload Form Column -->
+                <div class="col-12">
+                    <div class="product-item">
+                        <h3 class="product-title">Upload Your Product</h3>
+                        <form  action="upload_product" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- End Upload Form Column -->
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

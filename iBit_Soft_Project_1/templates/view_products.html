@@ -1,0 +1,48 @@
+{% extends 'index.html' %}
+{% load static %}
+{% static "images" as baseUrl %}
+
+{% block content %}
+    <!-- Start Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-lg-5">
+                    <div class="intro-excerpt">
+                        <h1>View All Products</h1>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <!-- Additional Content or Sidebar can go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Hero Section -->
+
+    <div class="untree_co-section product-section before-footer-section">
+        <div class="container">
+            <div class="row">
+                {% for product in products %}
+                    <!-- Start Product Column -->
+                    <div class="col-12 col-md-6 col-lg-4 mb-5">
+                        <a class="product-item" href="#">
+                            <img src="{{ product.image.url }}" class="img-fluid product-thumbnail" alt=
+                                    "{{ product.name }}">
+                            <div class="product-details">
+                                <h3 class="product-title">{{ product.name }}</h3>
+                                <strong class="product-price">${{ product.price }}</strong>
+                                <p class="product-description">{{ product.description }}</p>
+                                <p class="product-category">Category: {{ product.category }}</p>
+                                <p class="product-stock">Stock: {{ product.stock }}</p>
+                            </div>
+                        </a>
+                    </div>
+                    <!-- End Product Column -->
+                {% empty %}
+                    <p>No products available.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

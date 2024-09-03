@@ -3,6 +3,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
 
+from marketplacepro.forms import ProductForm
+from marketplacepro.models import Product
+
 
 # Create your views here.
 def index(request):
@@ -82,3 +85,23 @@ def register(request):
 def logout(request):
     auth.logout(request)
     return redirect('/')
+
+
+def upload_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('upload_product')
+    else:
+        form = ProductForm()
+    return render(request, 'upload_product.html', {'form': form})
+
+
+def admin_options(request):
+    return render(request, 'admin_options.html')
+
+
+def view_products(request):
+    products = Product.objects.all()
+    return render(request, 'view_products.html', {'products': products})

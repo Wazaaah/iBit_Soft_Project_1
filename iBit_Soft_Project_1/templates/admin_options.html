@@ -1,0 +1,74 @@
+{% extends 'index.html' %}
+{% load static %}
+{% static "images" as baseUrl %}
+
+{% block content %}
+    <!-- Start Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-lg-5">
+                    <div class="intro-excerpt">
+                        <h1>Admin Dashboard</h1>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <!-- Additional Content or Sidebar can go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Hero Section -->
+
+    <div class="untree_co-section product-section before-footer-section">
+        <div class="container">
+            <div class="row">
+                <!-- Start Admin Option Column 1 -->
+                <div class="col-12 col-md-6 col-lg-4 mb-5">
+                    <a class="admin-option-item" href="upload_product">
+                        <div class="card">
+                            <img src="{% static 'images/upload_product.png' %}" class="card-img-top img-fluid" 
+                                 alt="Upload Product">
+                            <div class="card-body">
+                                <h5 class="card-title">Upload Product</h5>
+                                <p class="card-text">Add new products to the shop.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- End Admin Option Column 1 -->
+
+                <!-- Start Admin Option Column 2 -->
+                <div class="col-12 col-md-6 col-lg-4 mb-5">
+                    <a class="admin-option-item" href="view_products">
+                        <div class="card">
+                            <img src="{% static 'images/view-products.png' %}" class="card-img-top img-fluid" alt="View Products">
+                            <div class="card-body">
+                                <h5 class="card-title">View Products</h5>
+                                <p class="card-text">Manage and review the products in the shop.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- End Admin Option Column 2 -->
+
+                <!-- Start Admin Option Column 4 -->
+                <div class="col-12 col-md-6 col-lg-4 mb-5">
+                    <a class="admin-option-item" href="view_reports">
+                        <div class="card">
+                            <img src="{% static 'images/view-reports.png' %}" class="card-img-top img-fluid" alt="View Reports">
+                            <div class="card-body">
+                                <h5 class="card-title">View Reports</h5>
+                                <p class="card-text">Generate and view various reports.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- End Admin Option Column 4 -->
+                
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
