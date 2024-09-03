@@ -4,7 +4,7 @@ from .models import Product, Cart, CartItem, Checkout, ShopBalance
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'stock', 'rating', 'is_active', 'created_at', 'updated_at')
+    list_display = ('name', 'category', 'price', 'stock', 'is_active', 'created_at', 'updated_at')
     list_filter = ('is_active', 'created_at', 'updated_at')
     search_fields = ('name', 'description')
     ordering = ('-created_at',)
