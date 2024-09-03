@@ -49,8 +49,21 @@
 					</ul>
 
 					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-						<li><a class="nav-link" href="login"><img src="{% static 'images/user.svg' %}"></a></li>
-						<li><a class="nav-link" href="cart"><img src="{% static 'images/cart.svg' %}"></a></li>
+                        {% if user.is_authenticated %}
+                             {% if user.is_superuser %}
+                             <li class="nav-item"><a class="nav-link">Hello, {{ user.first_name }}</a></li>
+                             <li><a class="nav-link" href="logout"><img src="{% static 'images/user.svg' %}"></a></li>
+                            {% else %}
+                            <li class="nav-item"><a class="nav-link">Hello, {{ user.first_name }}</a></li>
+                            <li><a class="nav-link" href="cart"><img src="{% static 'images/cart.svg' %}"></a></li>
+                            <li><a class="nav-link" href="logout"><img src="{% static 'images/user.svg' %}"></a></li>
+                            {% endif %}
+                        {% else %}
+                            <li><a class="nav-link" href="login"><img src="{% static 'images/user.svg' %}"></a></li>
+                            <li><a class="nav-link" href="cart"><img src="{% static 'images/cart.svg' %}"></a></li>
+                        {% endif %}
+{#						<li><a class="nav-link" href="login"><img src="{% static 'images/user.svg' %}"></a></li>#}
+{#						<li><a class="nav-link" href="cart"><img src="{% static 'images/cart.svg' %}"></a></li>#}
 					</ul>
 				</div>
 			</div>
