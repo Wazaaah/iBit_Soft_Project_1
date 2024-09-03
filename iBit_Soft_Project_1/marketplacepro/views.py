@@ -13,7 +13,8 @@ def index(request):
 
 
 def shop(request):
-    return render(request, 'shop.html')
+    products = Product.objects.all()
+    return render(request, 'shop.html', {'products': products})
 
 
 def contact(request):
