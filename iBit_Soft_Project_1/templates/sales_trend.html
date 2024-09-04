@@ -1,0 +1,41 @@
+{% extends 'index.html' %}
+
+{% load static %}
+{% static "images" as baseUrl %}
+
+{% block content %}
+    <!-- Start Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-lg-5">
+                    <div class="intro-excerpt">
+                        <h1>General Sales Trend</h1>
+                        <p>View the trend of items sold at exact times and days since the start of business.</p>
+                    </div>
+                </div>
+                <div class="col-lg-7"></div>
+            </div>
+        </div>
+    </div>
+    <!-- End Hero Section -->
+
+    <!-- Start Sales Trend Graph Section -->
+    <div class="untree_co-section before-footer-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="card">
+                        <div class="card-body">
+                                <div class="graph-container">
+                                    <img src="data:image/png;base64,{{ data }}" class="img-fluid" alt="Sales Trend Graph">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Sales Trend Graph Section -->
+    
+{% endblock %}

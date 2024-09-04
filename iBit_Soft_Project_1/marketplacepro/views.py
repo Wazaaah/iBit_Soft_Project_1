@@ -2,9 +2,15 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
-from django.contrib.auth.decorators import login_required
 from marketplacepro.forms import ProductForm
 from marketplacepro.models import Product, Cart, CartItem, ShopBalance, Checkout, CheckoutItem
+from django.utils import timezone
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from django.db.models import Sum
+from django.shortcuts import render
+import io
+import urllib, base64
 
 
 # Create your views here.
@@ -224,4 +230,125 @@ def purchase_report(request):
                 'checkout_date': checkout.checkout_date 
             })
     return render(request, 'purchase_report.html', {'report_data': report_data})
-            
+
+
+
+def sales_trend_view(request):
+    # Aggregate the total quantity sold at each exact timestamp
+    sales_data = (
+        CheckoutItem.objects
+        .values('date')  # Use exact date and time
+        .annotate(total_items_sold=Sum('quantity'))
+        .order_by('date')
+    )
+
+    # Convert to a list of dictionaries
+    data = list(sales_data)
+
+    # Extract dates and quantities for plotting
+    dates = [entry['date'] for entry in data]
+    quantities = [entry['total_items_sold'] for entry in data]
+
+    # Create the plot using Matplotlib
+    plt.figure(figsize=(12, 8))  # Increase figure size for better visibility
+    plt.plot(dates, quantities, marker='o', linestyle='-', color='dodgerblue', linewidth=2, markersize=8,
+             markerfacecolor='orange')
+
+    # Formatting the x-axis to show both date and time
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
+    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator())
+    plt.gcf().autofmt_xdate()  # Rotate date labels for better readability
+
+    # Set titles and labels
+    plt.title('Sales Trend by Exact Time', fontsize=20, fontweight='bold', color='darkblue')
+    plt.xlabel('Date and Time', fontsize=14, color='darkblue')
+    plt.ylabel('Total Items Sold', fontsize=14, color='darkblue')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.7, color='grey')
+
+    # Set y-axis to show integers only (no decimals)
+    plt.gca().yaxis.get_major_locator().set_params(integer=True)
+
+    # Add a background color
+    plt.gca().set_facecolor('#f7f7f7')
+
+    # Customize the ticks on both axes
+    plt.xticks(fontsize=12, color='darkblue')
+    plt.yticks(fontsize=12, color='darkblue')
+
+    # Add a legend
+    plt.legend(['Total Items Sold'], loc='upper left', fontsize=12)
+
+    # Save the plot to a string buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+
+    return render(request, 'sales_trend.html', {'data': uri})
+
+
+
+
+
+def sales_trend_view_today(request):
+    # Define the specific day you want to filter by
+    specific_day = timezone.now().date()  # For today, or you can specify a date
+
+    # Aggregate the total quantity sold at each exact timestamp for that specific day
+    sales_data = (
+        CheckoutItem.objects
+        .filter(date__date=specific_day)  # Filter by the specific day
+        .values('date')
+        .annotate(total_items_sold=Sum('quantity'))
+        .order_by('date')
+    )
+
+    # Convert to a list of dictionaries
+    data = list(sales_data)
+
+    # Extract dates and quantities for plotting
+    dates = [entry['date'] for entry in data]
+    quantities = [entry['total_items_sold'] for entry in data]
+
+    # Create the plot using Matplotlib
+    plt.figure(figsize=(12, 8))
+    plt.plot(dates, quantities, marker='o', linestyle='-', color='dodgerblue', linewidth=2, markersize=8,
+             markerfacecolor='orange')
+
+    # Formatting the x-axis to show both date and time
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
+    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator())
+    plt.gcf().autofmt_xdate()
+
+    # Set titles and labels
+    plt.title(f'Sales Trend for {specific_day}', fontsize=20, fontweight='bold', color='darkblue')
+    plt.xlabel('Date and Time', fontsize=14, color='darkblue')
+    plt.ylabel('Total Items Sold', fontsize=14, color='darkblue')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.7, color='grey')
+
+    # Set y-axis to show integers only (no decimals)
+    plt.gca().yaxis.get_major_locator().set_params(integer=True)
+
+    # Add a background color
+    plt.gca().set_facecolor('#f7f7f7')
+
+    # Customize the ticks on both axes
+    plt.xticks(fontsize=12, color='darkblue')
+    plt.yticks(fontsize=12, color='darkblue')
+
+    # Add a legend
+    plt.legend(['Total Items Sold'], loc='upper left', fontsize=12)
+
+    # Save the plot to a string buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+
+    return render(request, 'sales_trend_today.html', {'data': uri})
+
+
+def admin_options_2(request):
+    return render(request, 'admin_options_2.html')
