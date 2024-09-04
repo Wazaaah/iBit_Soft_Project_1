@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Cart, CartItem, Checkout, ShopBalance
+from .models import Product, Cart, CartItem, Checkout, ShopBalance, CheckoutItem
 
 
 @admin.register(Product)
@@ -37,3 +37,9 @@ class ShopBalanceAdmin(admin.ModelAdmin):
     list_filter = ('updated_at',)
     search_fields = ('user__username',)
     ordering = ('-updated_at',)
+
+
+@admin.register(CheckoutItem)
+class CheckoutItemAdmin(admin.ModelAdmin):
+    list_display = ('checkout', 'product', 'quantity', 'price')
+

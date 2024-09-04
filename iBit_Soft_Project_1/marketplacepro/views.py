@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User, auth
 from django.contrib.auth.decorators import login_required
 from marketplacepro.forms import ProductForm
-from marketplacepro.models import Product, Cart, CartItem, ShopBalance, Checkout
+from marketplacepro.models import Product, Cart, CartItem, ShopBalance, Checkout, CheckoutItem
 
 
 # Create your views here.
@@ -175,12 +175,28 @@ def place_order(request):
         shop_balance = get_object_or_404(ShopBalance, user=request.user)
 
         if shop_balance.balance >= total_price:
+            # Create a Checkout entry
+            checkout = Checkout.objects.create(
+                user=request.user,
+                total_price=total_price
+            )
+
+            # Save cart items to CheckoutItem
+            for item in cart.items.all():
+                CheckoutItem.objects.create(
+                    checkout=checkout,
+                    product=item.product,
+                    quantity=item.quantity,
+                    price=item.product.price
+                )
+
             # Deduct the amount from the shop balance
             shop_balance.balance -= total_price
             shop_balance.save()
 
             # Clear the cart
             cart.items.all().delete()
+
             return redirect('thankyou')  # Redirect to a thank you or order confirmation page
         else:
             messages.error(request, 'Insufficient balance to place the order.')
@@ -188,7 +204,6 @@ def place_order(request):
     return redirect('checkout')
 
 
-#To generate report on products purchased
 def purchase_report(request):
     
     checkouts = Checkout.objects.all()

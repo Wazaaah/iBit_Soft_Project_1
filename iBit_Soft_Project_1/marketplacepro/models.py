@@ -50,3 +50,13 @@ class ShopBalance(models.Model):
 
     def __str__(self):
         return f"Balance for {self.user.username}: {self.balance}"
+
+
+class CheckoutItem(models.Model):
+    checkout = models.ForeignKey(Checkout, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
