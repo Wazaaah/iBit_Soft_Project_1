@@ -1,0 +1,48 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <!-- Start Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-lg-5">
+                    <div class="intro-excerpt">
+                        <h1>Report For Today</h1>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if records %}
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.user }}</td>
+                <td>{{ record.product_name }}</td>
+                <td>{{ record.category }}</td>
+                <td>{{ record.price }}</td>
+                <td>{{ record.quantity }}</td>
+                <td>{{ record.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-center mt-4">No records found for today.</p>
+    {% endif %}
+    
+{% endblock %}

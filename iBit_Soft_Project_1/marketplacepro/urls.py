@@ -20,4 +20,5 @@ urlpatterns = [
     path('sales_trend_view', views.sales_trend_view, name='sales_trend_view'),
     path('sales_trend_view_today', views.sales_trend_view_today, name='sales_trend_view_today'),
     path('admin_options_2', views.admin_options_2, name='admin_options_2'),
+    path('report_for_today', views.report_for_today, name='report_for_today'),
 ]

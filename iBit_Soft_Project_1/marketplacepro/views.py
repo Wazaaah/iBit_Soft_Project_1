@@ -22,7 +22,7 @@ def index(request):
 
 
 def shop(request):
-    products = Product.objects.all()
+    products = Product.objects.all().order_by('?')
     return render(request, 'shop.html', {'products': products})
 
 
@@ -211,7 +211,6 @@ def place_order(request):
 
 
 def purchase_report(request):
-    
     checkouts = Checkout.objects.all()
 
     report_data = []
@@ -221,16 +220,15 @@ def purchase_report(request):
 
         for item in cart_items:
             report_data.append({
-               'user': checkout.user.username,
+                'user': checkout.user.username,
                 'product_name': item.product.name,
                 'category': item.product.category,
                 'price': item.product.price,
                 'quantity': item.quantity,
                 'total_price': item.quantity * item.product.price,
-                'checkout_date': checkout.checkout_date 
+                'checkout_date': checkout.checkout_date
             })
     return render(request, 'purchase_report.html', {'report_data': report_data})
-
 
 
 def sales_trend_view(request):
@@ -286,9 +284,6 @@ def sales_trend_view(request):
     uri = urllib.parse.quote(string)
 
     return render(request, 'sales_trend.html', {'data': uri})
-
-
-
 
 
 def sales_trend_view_today(request):
@@ -352,3 +347,24 @@ def sales_trend_view_today(request):
 
 def admin_options_2(request):
     return render(request, 'admin_options_2.html')
+
+
+def report_for_today(request):
+    today = timezone.now().date()
+    records = CheckoutItem.objects.filter(date__date=today)  # Use __date to filter by just the date part
+
+    main_records = []
+    for record in records:
+        main_records.append({
+            'user': record.checkout.user.username,
+            'product_name': record.product.name,
+            'category': record.product.category,
+            'price': record.price,  # Use record.price for the individual item price
+            'quantity': record.quantity,
+            'total_price': record.price * record.quantity,  # Calculate total price for the individual item
+        })
+
+    context = {
+        'records': main_records
+    }
+    return render(request, "report_for_today.html", context)
