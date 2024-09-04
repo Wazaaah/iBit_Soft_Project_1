@@ -1,10 +1,10 @@
 from django.contrib.auth import authenticate, login as auth_login
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
 
 from marketplacepro.forms import ProductForm
-from marketplacepro.models import Product
+from marketplacepro.models import Product, Cart, CartItem
 
 
 # Create your views here.
@@ -21,12 +21,9 @@ def contact(request):
     return render(request, 'contact.html')
 
 
-def cart(request):
-    return render(request, 'cart.html')
-
-
 def checkout(request):
-    return render(request, 'checkout.html')
+    cart = get_object_or_404(Cart, user=request.user)
+    return render(request, 'checkout.html', {'cart': cart})
 
 
 def thankyou(request):
@@ -106,3 +103,54 @@ def admin_options(request):
 def view_products(request):
     products = Product.objects.all()
     return render(request, 'view_products.html', {'products': products})
+
+
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    # Check if the product is in stock
+    if product.stock > 0:
+        # Get the user's cart or create one if it doesn't exist
+        cart, created = Cart.objects.get_or_create(user=request.user)
+
+        # Check if the cart already has this product
+        cart_item, created = CartItem.objects.get_or_create(product=product)
+
+        if not created:
+            # If the item already exists in the cart, increase the quantity
+            cart_item.quantity += 1
+        else:
+            # If the item is newly created, set the quantity to 1
+            cart_item.quantity = 1
+
+        cart_item.save()
+
+        # Add the cart item to the user's cart
+        cart.items.add(cart_item)
+
+        # Reduce the product stock
+        product.stock -= 1
+        product.save()
+
+        messages.success(request, f'Added {product.name} to your cart.')
+    else:
+        messages.error(request, f'Sorry, {product.name} is out of stock.')
+
+    return redirect('shop')
+
+
+def cart_view(request):
+    cart = get_object_or_404(Cart, user=request.user)
+    return render(request, 'cart.html', {'cart': cart})
+
+
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id)
+
+    # Increase the stock when an item is removed
+    product = cart_item.product
+    product.stock += cart_item.quantity
+    product.save()
+
+    cart_item.delete()
+    return redirect('cart_view')
