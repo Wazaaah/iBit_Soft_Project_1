@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login as auth_login
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
@@ -22,8 +23,42 @@ def index(request):
 
 
 def shop(request):
-    products = Product.objects.all().order_by('?')
-    return render(request, 'shop.html', {'products': products})
+    category_filter = request.GET.get('category')
+    sort_by = request.GET.get('sort_by')
+
+    # Filter by category if provided
+    if category_filter:
+        products = Product.objects.filter(category=category_filter)
+    else:
+        products = Product.objects.all()
+
+    # Sort by price if specified
+    if sort_by == 'price_asc':
+        products = products.order_by('price')
+    elif sort_by == 'price_desc':
+        products = products.order_by('-price')
+    else:
+        products = products.order_by('?')  # Random order as default
+
+    # Get unique categories for filter dropdown
+    categories = Product.objects.values_list('category', flat=True).distinct()
+
+    # Get the number of items in the cart for the logged-in user
+    try:
+        cart = Cart.objects.get(user=request.user)
+        cart_item_count = cart.items.aggregate(total_items=Sum('quantity'))['total_items'] or 0
+    except Cart.DoesNotExist:
+        cart_item_count = 0
+
+    context = {
+        'products': products,
+        'categories': categories,
+        'selected_category': category_filter,
+        'selected_sort': sort_by,
+        'cart_item_count': cart_item_count,
+    }
+
+    return render(request, 'shop.html', context)
 
 
 def contact(request):
@@ -54,7 +89,7 @@ def login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             auth_login(request, user)
-            return redirect('/')  # Redirect to the home page or another page
+            return redirect('/')
         else:
             messages.error(request, 'Invalid username or password')
 
@@ -368,3 +403,11 @@ def report_for_today(request):
         'records': main_records
     }
     return render(request, "report_for_today.html", context)
+
+
+def get_cart_count(request):
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart = get_object_or_404(Cart, user=request.user)
+        cart_count = cart.items.count()  # Adjust this based on your Cart model
+    return JsonResponse({'cart_count': cart_count})
