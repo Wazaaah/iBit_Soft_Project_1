@@ -4,12 +4,15 @@ from django.contrib import messages
 from django.contrib.auth.models import User, auth
 from django.contrib.auth.decorators import login_required
 from marketplacepro.forms import ProductForm
-from marketplacepro.models import Product, Cart, CartItem, ShopBalance
+from marketplacepro.models import Product, Cart, CartItem, ShopBalance, Checkout
 
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    products = Product.objects.all().order_by('?')
+    # Limit to 3 random products
+    products = products[:3]
+    return render(request, 'index.html', {'products': products})
 
 
 def shop(request):
@@ -183,6 +186,7 @@ def place_order(request):
             messages.error(request, 'Insufficient balance to place the order.')
 
     return redirect('checkout')
+
 
 #To generate report on products purchased
 def purchase_report(request):
