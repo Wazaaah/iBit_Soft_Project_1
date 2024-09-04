@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
-
+from django.contrib.auth.decorators import login_required
 from marketplacepro.forms import ProductForm
 from marketplacepro.models import Product, Cart, CartItem, ShopBalance
 
@@ -183,3 +183,26 @@ def place_order(request):
             messages.error(request, 'Insufficient balance to place the order.')
 
     return redirect('checkout')
+
+#To generate report on products purchased
+def purchase_report(request):
+    
+    checkouts = Checkout.objects.all()
+
+    report_data = []
+    for checkout in checkouts:
+
+        cart_items = CartItem.objects.filter(carts_checkout=checkout)
+
+        for item in cart_items:
+            report_data.append({
+               'user': checkout.user.username,
+                'product_name': item.product.name,
+                'category': item.product.category,
+                'price': item.product.price,
+                'quantity': item.quantity,
+                'total_price': item.quantity * item.product.price,
+                'checkout_date': checkout.checkout_date 
+            })
+    return render(request, 'purchase_report.html', {'report_data': report_data})
+            
