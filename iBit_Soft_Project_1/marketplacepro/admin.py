@@ -41,5 +41,5 @@ class ShopBalanceAdmin(admin.ModelAdmin):
 
 @admin.register(CheckoutItem)
 class CheckoutItemAdmin(admin.ModelAdmin):
-    list_display = ('checkout', 'product', 'quantity', 'price')
+    list_display = ('checkout', 'product', 'quantity', 'price', 'date')
 
