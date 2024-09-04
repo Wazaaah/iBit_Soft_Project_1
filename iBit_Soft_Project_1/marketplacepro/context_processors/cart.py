@@ -6,6 +6,6 @@ from marketplacepro.models import Cart
 def cart_count(request):
     cart_count = 0
     if request.user.is_authenticated:
-        cart = get_object_or_404(Cart, user=request.user)
-        cart_count = cart.items.count()  # Adjust based on your Cart model
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart_count = cart.items.count()
     return {'cart_count': cart_count}
