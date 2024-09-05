@@ -204,6 +204,7 @@ def remove_from_cart(request, item_id):
     product.save()
 
     cart_item.delete()
+    messages.success(request, f'Removed {product.name} from your cart.')
     return redirect('cart_view')
 
 
@@ -243,7 +244,6 @@ def place_order(request):
             messages.error(request, 'Insufficient balance to place the order.')
 
     return redirect('checkout')
-
 
 
 def sales_trend_view(request):

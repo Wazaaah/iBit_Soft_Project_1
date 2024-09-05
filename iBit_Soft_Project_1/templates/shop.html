@@ -44,7 +44,15 @@
     </div>
 </div>
 <!-- End Hero Section -->
-
+{% if messages %}
+<div class="container mt-4">
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 <div class="untree_co-section product-section before-footer-section">
     <div class="container">
