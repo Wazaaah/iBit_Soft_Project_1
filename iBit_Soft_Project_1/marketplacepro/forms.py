@@ -19,3 +19,7 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'description', 'category', 'price', 'stock', 'image']
+
+
+class DateSelectionForm(forms.Form):
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label="Select a date")

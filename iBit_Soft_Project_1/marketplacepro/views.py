@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
-from marketplacepro.forms import ProductForm
+from marketplacepro.forms import ProductForm, DateSelectionForm
 from marketplacepro.models import Product, Cart, CartItem, ShopBalance, Checkout, CheckoutItem
 from django.utils import timezone
 import matplotlib.pyplot as plt
@@ -245,26 +245,6 @@ def place_order(request):
     return redirect('checkout')
 
 
-def purchase_report(request):
-    checkouts = Checkout.objects.all()
-
-    report_data = []
-    for checkout in checkouts:
-
-        cart_items = CartItem.objects.filter(carts_checkout=checkout)
-
-        for item in cart_items:
-            report_data.append({
-                'user': checkout.user.username,
-                'product_name': item.product.name,
-                'category': item.product.category,
-                'price': item.product.price,
-                'quantity': item.quantity,
-                'total_price': item.quantity * item.product.price,
-                'checkout_date': checkout.checkout_date
-            })
-    return render(request, 'purchase_report.html', {'report_data': report_data})
-
 
 def sales_trend_view(request):
     # Aggregate the total quantity sold at each exact timestamp
@@ -384,25 +364,36 @@ def admin_options_2(request):
     return render(request, 'admin_options_2.html')
 
 
-def report_for_today(request):
-    today = timezone.now().date()
-    records = CheckoutItem.objects.filter(date__date=today)  # Use __date to filter by just the date part
+def report_for_specific_day(request):
+    form = DateSelectionForm(request.GET or None)
+    selected_date = timezone.now().date()  # Default to today
+
+    if form.is_valid():
+        selected_date = form.cleaned_data['date']  # Get the selected date from the form
+
+    records = CheckoutItem.objects.filter(date__date=selected_date)  # Filter by the selected date
 
     main_records = []
+    total_amount = 0
     for record in records:
+        total_price = record.price * record.quantity
+        total_amount += total_price
         main_records.append({
             'user': record.checkout.user.username,
             'product_name': record.product.name,
             'category': record.product.category,
-            'price': record.price,  # Use record.price for the individual item price
+            'price': record.price,
             'quantity': record.quantity,
-            'total_price': record.price * record.quantity,  # Calculate total price for the individual item
+            'total_price': total_price,
         })
 
     context = {
-        'records': main_records
+        'form': form,  # Pass the form to the template
+        'records': main_records,
+        'total_amount': total_amount,
+        'selected_date': selected_date,  # Pass the selected date for displaying
     }
-    return render(request, "report_for_today.html", context)
+    return render(request, "report_for_specific_day.html", context)
 
 
 def get_cart_count(request):
